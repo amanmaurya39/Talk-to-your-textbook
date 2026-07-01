@@ -91,7 +91,7 @@ cd talk-to-your-textbook
 # 2. Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate        # Mac/Linux
-venv\Scripts\activate           # Windows
+venv\Scripts\activate          # Windows
 
 # 3. Install dependencies
 pip install -r requirements.txt
@@ -239,6 +239,3 @@ Test questions: [`eval/test_questions.csv`](eval/test_questions.csv)
 | **OpenAI API cost** | ~$0.01 per full document query | Use smaller PDFs for testing |
 | **No memory across sessions** | Each browser session starts fresh | Re-upload PDF each session |
 | **Single language** (English only) | Non-English PDFs give poor results | English PDFs only for now |
-
----
-

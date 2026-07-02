@@ -3,7 +3,6 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-client = OpenAI()
 
 SYSTEM_PROMPT = """You are a helpful study assistant that answers questions about documents.
 
@@ -17,33 +16,34 @@ STRICT RULES:
 """
 
 def generate_answer(query: str, chunks: list) -> dict:
-	"""Send query + retrieved chunks to GPT-4o-mini, get cited answer"""
+    """Send query + retrieved chunks to GPT-4o-mini, get cited answer"""
+    client = OpenAI()
     
-	# Build context string from chunks
-	context = ""
-	for chunk in chunks:
-		context += f"\n--- Page {chunk['page_number']} ---\n{chunk['text']}\n"
+    # Build context string from chunks
+    context = ""
+    for chunk in chunks:
+        context += f"\n--- Page {chunk['page_number']} ---\n{chunk['text']}\n"
     
-	messages = [
-		{"role": "system", "content": SYSTEM_PROMPT},
-		{"role": "user", "content": f"Context:\n{context}\n\nQuestion: {query}"}
-	]
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {query}"}
+    ]
     
-	response = client.chat.completions.create(
-		model="gpt-4o-mini",
-		messages=messages,
-		temperature=0  # deterministic — important for citations
-	)
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        temperature=0  # deterministic — important for citations
+    )
     
-	answer = response.choices[0].message.content
+    answer = response.choices[0].message.content
     
-	return {
-		"answer": answer,
-		"sources": [
-			{
-				"page": c["page_number"],
-				"snippet": c["text"][:200] + "..."
-			}
-			for c in chunks
-		]
-	}
+    return {
+        "answer": answer,
+        "sources": [
+            {
+                "page": c["page_number"],
+                "snippet": c["text"][:200] + "..."
+            }
+            for c in chunks
+        ]
+    }

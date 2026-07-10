@@ -32,13 +32,13 @@ This is not a general-purpose chatbot. It only answers from your document. If th
 │                                                             │
 │  ┌──────────┐    ┌──────────┐    ┌─────────────────────┐   │
 │  │  Upload  │───▶│  Parse   │───▶│   Chunk + Embed     │   │
-│  │  PDF     │    │ PyMuPDF  │    │ LangChain + OpenAI  │   │
+│  │  PDF     │    │ PyMuPDF  │    │ LangChain + Google  │   │
 │  └──────────┘    └──────────┘    └──────────┬──────────┘   │
 │                                             │               │
 │                                             ▼               │
 │  ┌──────────┐    ┌──────────┐    ┌─────────────────────┐   │
 │  │ Streamlit│◀───│   LLM    │◀───│  Hybrid Retrieval   │   │
-│  │   UI     │    │GPT-4o-mini│   │ ChromaDB + BM25     │   │
+│  │   UI     │    │Gemini     │   │ ChromaDB + BM25     │   │
 │  └──────────┘    └──────────┘    └─────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -49,10 +49,10 @@ See [`docs/architecture.png`](docs/architecture.png) for the full C4 Level 1 dia
 1. User uploads a PDF via Streamlit
 2. PyMuPDF parses text page-by-page, preserving page numbers
 3. LangChain splits text into 400-token chunks with 50-token overlap
-4. OpenAI `text-embedding-3-small` embeds each chunk
+4. Google `text-embedding-004` embeds each chunk
 5. Chunks + embeddings stored in ChromaDB (persistent local vector store)
 6. User asks a question → query embedded → hybrid retrieval (dense + BM25)
-7. Top 5 chunks sent to GPT-4o-mini with a strict citation prompt
+7. Top 5 chunks sent to Google gemini-pro with a strict citation prompt
 8. Answer displayed with source page numbers and text snippets
 
 ---
@@ -63,10 +63,10 @@ See [`docs/architecture.png`](docs/architecture.png) for the full C4 Level 1 dia
 |---|---|---|
 | **PDF Parsing** | PyMuPDF (`fitz`) | Fast, reliable, preserves page numbers accurately |
 | **Chunking** | LangChain `RecursiveCharacterTextSplitter` | Handles overlap and paragraph boundaries cleanly |
-| **Embeddings** | OpenAI `text-embedding-3-small` | Best quality-to-cost ratio for semantic search |
+| **Embeddings** | Google `text-embedding-004` | Free, high-performance semantic search embeddings |
 | **Vector Store** | ChromaDB (persistent) | Zero-infrastructure, runs locally, easy to reset |
 | **Retrieval** | Hybrid (ChromaDB dense + `rank_bm25`) | Dense handles semantics; BM25 handles exact terms |
-| **LLM** | GPT-4o-mini | Cheapest model with strong instruction-following for citations |
+| **LLM** | Google gemini-pro | Free tier model with strong instruction-following for citations |
 | **UI** | Streamlit | Fastest path to a working, deployable app |
 | **Hosting** | Streamlit Community Cloud | Free, one-click deploy, no server management |
 | **Evaluation** | Manual CSV + Ragas | 20+ human-rated Q&A pairs for precision/recall scoring |
@@ -78,7 +78,7 @@ See [`docs/architecture.png`](docs/architecture.png) for the full C4 Level 1 dia
 ### Prerequisites
 
 - Python 3.10 or higher
-- An OpenAI API key ([get one here](https://platform.openai.com/api-keys))
+- A Google AI Studio API key ([get one here](https://aistudio.google.com/))
 - Git
 
 ### Install
@@ -98,8 +98,8 @@ pip install -r requirements.txt
 
 # 4. Set up your environment variables
 cp .env.example .env
-# Open .env and add your OpenAI API key:
-# OPENAI_API_KEY=sk-...
+# Open .env and add your Google API key:
+# GOOGLE_API_KEY=your-google-ai-studio-key-here
 ```
 
 ### Run
@@ -145,9 +145,6 @@ talk-to-your-textbook/
 │   └── evaluate.py        # Evaluation pipeline (Ragas)
 ├── app/
 │   └── app.py             # Streamlit UI
-├── data/
-│   └── sample_pdfs/       # Sample test PDFs (public domain)
-│       └── ml_intro.pdf   # Machine learning intro chapter (test doc)
 ├── eval/
 │   └── test_questions.csv # 20+ human-rated Q&A pairs
 ├── tests/
@@ -169,14 +166,9 @@ talk-to-your-textbook/
 
 ## 📊 Data Sources
 
-This project works on **any PDF you upload** — it has no fixed dataset. For testing and evaluation:
+This project works on **any PDF you upload** — it has no fixed dataset. For evaluation, we use a dataset of hand-authored Q&A pairs in `eval/test_questions.csv` based on sample textbook chapters.
 
-| File | Source | Used For |
-|---|---|---|
-| `data/sample_pdfs/ml_intro.pdf` | Public domain ML lecture notes | Primary test document |
-| `eval/test_questions.csv` | Hand-authored Q&A pairs | Evaluation of retrieval + generation quality |
-
-No proprietary or personal data is stored. Uploaded PDFs are processed locally and not sent anywhere except the OpenAI embeddings API.
+No proprietary or personal data is stored. Uploaded PDFs are processed locally and not sent anywhere except the Google embeddings API.
 
 ---
 
@@ -200,7 +192,7 @@ The mini-extension (built in Week 3) adds the ability to **upload two PDFs and c
 - Upload PDF A and PDF B (e.g., two versions of a syllabus, two chapters on the same topic)
 - Ask: *"What does each document say about backpropagation?"*
 - The system retrieves top chunks from **both** documents separately
-- GPT-4o-mini compares them side-by-side with citations from each source
+- Google gemini-pro compares them side-by-side with citations from each source
 
 **Why this matters:**
 This is the simplest form of multi-document RAG — a pattern used in legal tech (compare contract versions), edtech (compare textbook editions), and research tools. It shows the pipeline generalises beyond single-document Q&A.
@@ -236,6 +228,18 @@ Test questions: [`eval/test_questions.csv`](eval/test_questions.csv)
 | **Scanned PDFs** (images only) not supported | No text extracted from image-based PDFs | Use text-layer PDFs only |
 | **Tables and figures** not parsed well | Tabular data may lose structure | Manually note table data |
 | **Very large PDFs** (500+ pages) slow to ingest | Embedding 500 pages takes ~2-3 min | Split large PDFs first |
-| **OpenAI API cost** | ~$0.01 per full document query | Use smaller PDFs for testing |
+| **Google API free tier** | Rate limits on free tier — max 60 requests/min | Be mindful of rate limits |
 | **No memory across sessions** | Each browser session starts fresh | Re-upload PDF each session |
 | **Single language** (English only) | Non-English PDFs give poor results | English PDFs only for now |
+
+## What I Learned
+
+**Week 2 (6 Jul – 11 Jul):**
+- Tested with a real textbook PDF — chunk count jumps from 1 to 100+ 
+  which makes Q&A actually work
+- Hybrid retrieval (BM25 + dense) gives noticeably better results 
+  than dense-only for exact terminology questions
+- Error handling in Streamlit needs explicit st.stop() otherwise 
+  the app keeps running after an error silently
+- Gemini model names differ by API key tier — always run 
+  list_models() first to see what's available

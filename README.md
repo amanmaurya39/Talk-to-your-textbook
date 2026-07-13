@@ -154,7 +154,7 @@ talk-to-your-textbook/
 │   ├── architecture.png   # C4 Level 1 diagram
 │   └── adr/
 │       ├── ADR-001.md     # Why ChromaDB over Pinecone/Qdrant
-│       ├── ADR-002.md     # Why GPT-4o-mini over open-source LLMs
+│       ├── ADR-002.md     # Why Google Gemini over open-source LLMs
 │       └── ADR-003.md     # Why hybrid retrieval over dense-only
 ├── .env.example           # Environment variable template
 ├── .gitignore
@@ -179,7 +179,7 @@ All major technical decisions are documented with context, trade-offs, and alter
 | ADR | Decision | Status |
 |---|---|---|
 | [ADR-001](docs/adr/ADR-001.md) | ChromaDB as vector store | Accepted |
-| [ADR-002](docs/adr/ADR-002.md) | GPT-4o-mini as generation model | Accepted |
+| [ADR-002](docs/adr/ADR-002.md) | Google Gemini as generation model | Accepted |
 | [ADR-003](docs/adr/ADR-003.md) | Hybrid retrieval over dense-only | Accepted |
 
 ---

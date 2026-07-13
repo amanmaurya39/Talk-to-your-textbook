@@ -1,41 +1,11 @@
-# Virtual environments
-venv/
-env/
-ENV/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Environment
 .env
-.env.local
-
-# OS
+venv/
+chroma_db/
+chroma_db/*/
+chroma_db/chroma.sqlite3
+__pycache__/
+*.pyc
+temp.pdf
 .DS_Store
-Thumbs.db
+*.egg-info/
+dist/

@@ -15,7 +15,11 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 # ── ChromaDB client ───────────────────────────────────────
-chroma_client = chromadb.PersistentClient(path=os.path.join(ROOT, "chroma_db"))
+# Use persistent locally, in-memory on cloud
+if os.getenv("STREAMLIT_CLOUD"):
+    chroma_client = chromadb.EphemeralClient()
+else:
+    chroma_client = chromadb.PersistentClient(path=os.path.join(ROOT, "chroma_db"))
 
 
 def embed_query(query: str) -> list:

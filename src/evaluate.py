@@ -2,6 +2,7 @@
 import os
 import sys
 import csv
+import time
 
 # Ensure the root directory is in the path so we can import src
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -51,6 +52,11 @@ def run_evaluation(pdf_path: str = None):
         question = row.get("question")
         if not question or question.startswith("Placeholder"):
             continue
+
+        # If it's not the first query we run, sleep to respect free-tier rate limits
+        if updated_count > 0:
+            print("Sleeping for 15 seconds to respect API rate limits...")
+            time.sleep(15)
 
         print(f"\n[{idx}/{len(rows)}] Question: {question}")
         try:

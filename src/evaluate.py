@@ -17,19 +17,19 @@ def run_evaluation(pdf_path: str = None):
     csv_path = os.path.join(ROOT, "eval", "test_questions.csv")
     
     if not os.path.exists(csv_path):
-        print(f"❌ Error: {csv_path} not found. Please create it first.")
+        print(f"[Error] {csv_path} not found. Please create it first.")
         return
 
     # 1. Option to ingest PDF if provided
     if pdf_path:
         if not os.path.exists(pdf_path):
-            print(f"❌ Error: PDF not found at {pdf_path}")
+            print(f"[Error] PDF not found at {pdf_path}")
             return
-        print(f"📖 Ingesting PDF: {pdf_path}...")
+        print(f"Ingesting PDF: {pdf_path}...")
         pages = load_pdf(pdf_path)
         chunks = chunk_pages(pages)
         embed_and_store(chunks)
-        print("✅ Ingestion complete. Starting evaluation...\n")
+        print("Ingestion complete. Starting evaluation...\n")
 
     # 2. Read questions from CSV
     rows = []
@@ -40,10 +40,10 @@ def run_evaluation(pdf_path: str = None):
             rows.append(row)
 
     if not rows:
-        print("⚠️ No questions found in the CSV file.")
+        print("[Warning] No questions found in the CSV file.")
         return
 
-    print(f"🚀 Running {len(rows)} evaluation questions through the RAG pipeline...")
+    print(f"Running {len(rows)} evaluation questions through the RAG pipeline...")
 
     # 3. Query RAG and update actual_answer
     updated_count = 0
@@ -65,15 +65,15 @@ def run_evaluation(pdf_path: str = None):
             row["actual_answer"] = actual_answer
             updated_count += 1
             
-            print(f"🤖 Answer: {actual_answer}")
+            print(f"Answer: {actual_answer}")
             
             # Print citations for quick verification
             sources = result.get("sources", [])
             cited_pages = [str(s["page"]) for s in sources]
-            print(f"📌 Cited pages: {', '.join(cited_pages)}")
+            print(f"Cited pages: {', '.join(cited_pages)}")
             
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"[Error] {e}")
             row["actual_answer"] = f"Error: {e}"
 
     # 4. Write back to CSV
@@ -82,8 +82,8 @@ def run_evaluation(pdf_path: str = None):
         writer.writeheader()
         writer.writerows(rows)
 
-    print(f"\n\n✅ Done! Updated {updated_count} actual answers in {csv_path}")
-    print("👉 Next step: Open the CSV file and manually fill in the 'correctness' (1-3) and 'citation_correct' (yes/no) columns.")
+    print(f"\n\nDone! Updated {updated_count} actual answers in {csv_path}")
+    print("Next step: Open the CSV file and manually fill in the 'correctness' (1-3) and 'citation_correct' (yes/no) columns.")
 
 if __name__ == "__main__":
     # If a PDF path is passed as command line argument, ingest it first

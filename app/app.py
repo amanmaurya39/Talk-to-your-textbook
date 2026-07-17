@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 import streamlit as st
 import sys
 import os
@@ -11,6 +12,7 @@ from src.ingest import load_pdf, chunk_pages
 from src.embed import embed_and_store
 from src.retrieve import hybrid_retrieve
 from src.generate import generate_answer
+from src.compare import compare_documents
 
 # ── Page Config ───────────────────────────────────────────
 st.set_page_config(
@@ -38,6 +40,7 @@ st.caption("Upload any PDF and ask questions — get answers with exact page cit
 # ── Sidebar ───────────────────────────────────────────────
 with st.sidebar:
     st.header("📄 Your Document")
+    compare_mode = st.toggle("🔀 Compare Two Documents", value=False)
 
     uploaded_file = st.file_uploader(
         "Upload a PDF",

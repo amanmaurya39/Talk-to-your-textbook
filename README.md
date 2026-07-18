@@ -6,7 +6,7 @@
 
 ## 🎬 Demo
 
-> 🔗 **Live App:** [Coming after Week 4 deployment — Streamlit Community Cloud]()
+> 🔗 **Live App:** [Streamlit Community Cloud](https://aman-maurya-talk-to-your-textbook.streamlit.app/)
 >
 > 📹 **Loom Walkthrough:** [Coming after Week 4 — 3 min demo video]()
 

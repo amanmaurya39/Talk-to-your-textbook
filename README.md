@@ -26,24 +26,7 @@ This is not a general-purpose chatbot. It only answers from your document. If th
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    TALK TO YOUR TEXTBOOK                    │
-│                                                             │
-│  ┌──────────┐    ┌──────────┐    ┌─────────────────────┐   │
-│  │  Upload  │───▶│  Parse   │───▶│   Chunk + Embed     │   │
-│  │  PDF     │    │ PyMuPDF  │    │ LangChain + Google  │   │
-│  └──────────┘    └──────────┘    └──────────┬──────────┘   │
-│                                             │               │
-│                                             ▼               │
-│  ┌──────────┐    ┌──────────┐    ┌─────────────────────┐   │
-│  │ Streamlit│◀───│   LLM    │◀───│  Hybrid Retrieval   │   │
-│  │   UI     │    │Gemini     │   │ ChromaDB + BM25     │   │
-│  └──────────┘    └──────────┘    └─────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-See [`docs/architecture.png`](docs/architecture.png) for the full C4 Level 1 diagram.
+![Architecture Diagram](docs/architecture.png)
 
 **Pipeline:**
 1. User uploads a PDF via Streamlit

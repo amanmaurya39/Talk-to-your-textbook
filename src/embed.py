@@ -22,13 +22,30 @@ else:
     chroma_client = chromadb.PersistentClient(path=os.path.join(ROOT, "chroma_db"))
 
 
+import time
+from google.api_core.exceptions import ResourceExhausted
+
 def get_embedding(text: str) -> list:
-    """Get embedding for a single text using Gemini embeddings."""
-    result = genai.embed_content(
-        model="models/gemini-embedding-001",
-        content=text
-    )
-    return result["embedding"]
+    """Get embedding for a single text using Gemini embeddings with rate-limit retries."""
+    for attempt in range(6):
+        try:
+            result = genai.embed_content(
+                model="models/gemini-embedding-001",
+                content=text
+            )
+            return result["embedding"]
+        except ResourceExhausted:
+            wait_time = (2 ** attempt) + 1
+            print(f"⚠️ Rate limit hit. Waiting {wait_time}s before retry...")
+            time.sleep(wait_time)
+        except Exception as e:
+            if "429" in str(e):
+                wait_time = (2 ** attempt) + 1
+                print(f"⚠️ Rate limit hit (429). Waiting {wait_time}s before retry...")
+                time.sleep(wait_time)
+            else:
+                raise e
+    raise RuntimeError("Failed to generate embedding: Rate limit exceeded after multiple retries.")
 
 
 def embed_and_store(chunks: list, collection_name: str = "textbook"):

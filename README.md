@@ -8,7 +8,7 @@
 
 > 🔗 **Live App:** [Streamlit Community Cloud](https://aman-maurya-talk-to-your-textbook.streamlit.app/)
 >
-> 📹 **Loom Walkthrough:** [Coming after Week 4 — 3 min demo video]()
+> 📹 **Loom Walkthrough:** [3 min demo video](https://www.loom.com/share/c2670f1ab6a84bde9e0d4152c3522405)
 
 ![App Screenshot](docs/screenshot.png)
 
